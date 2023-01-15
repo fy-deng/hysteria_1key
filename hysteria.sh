@@ -164,7 +164,7 @@ rm -rf install_server.sh
 
 inscertificate(){
 green "hysteria协议证书申请方式选择如下:"
-readp "1. www.bing.com自签证书（回车默认）\n2. acme一键申请证书脚本（支持常规80端口模式与dns api模式），已用此脚本申请的证书则自动识别\n3. 自定义证书路径（非/root/ygkkkca路径）\n请选择：" certificate
+readp "1. www.bing.com自签证书（回车默认）\n2. acme一键申请证书脚本（支持常规80端口模式与dns api模式），已用此脚本申请的证书则自动识别\n3. 自定义证书路径（非/etc/ssl/private路径）\n请选择：" certificate
 if [ -z "${certificate}" ] || [ $certificate == "1" ]; then
 openssl ecparam -genkey -name prime256v1 -out /etc/hysteria/private.key
 openssl req -new -x509 -days 36500 -key /etc/hysteria/private.key -out /etc/hysteria/cert.crt -subj "/CN=www.bing.com"
@@ -175,7 +175,7 @@ blue "已确认证书模式: www.bing.com自签证书\n"
 elif [ $certificate == "2" ]; then
 if [[ -f /etc/ssl/private/cert.crt && -f /etc/ssl/private/private.key ]] && [[ -s /etc/ssl/private/cert.crt && -s /etc/ssl/private/private.key ]]; then
 blue "经检测，之前已使用此acme脚本申请过证书"
-readp "1. 直接使用root/ygkkkca目录下申请过证书（回车默认）\n2. 删除原来的证书，重新申请acme证书\n请选择：" certacme
+readp "1. 直接使用etc/ssl/private目录下申请过证书（回车默认）\n2. 删除原来的证书，重新申请acme证书\n请选择：" certacme
 if [ -z "${certacme}" ] || [ $certacme == "1" ]; then
 ym=$(cat /etc/ssl/private/ca.log)
 blue "检测到的域名：$ym ，已直接引用\n"
@@ -200,8 +200,8 @@ if [[ ! -f /etc/ssl/private/cert.crt && ! -f /etc/ssl/private/private.key ]] && 
 red "证书申请失败，脚本退出" && exit
 fi
 fi
-certificatec='/root/ygkkkca/cert.crt'
-certificatep='/root/ygkkkca/private.key'
+certificatec='/etc/ssl/private/cert.crt'
+certificatep='/etc/ssl/private/private.key'
 elif [ $certificate == "3" ]; then
 readp "请输入已放置好的公钥文件crt的路径（/a/b/……/cert.crt）：" cerroad
 blue "公钥文件crt的路径：$cerroad "
@@ -638,9 +638,9 @@ wgcfgo
 }
 
 whcertificate(){
-if [[ -n $(cat /etc/hysteria/config.json 2>/dev/null | sed -n 12p | grep -w ygkkkca) ]]; then
-certificatepp='/root/ygkkkca/private.key'
-certificatecc='/root/ygkkkca/cert.crt'
+if [[ -n $(cat /etc/hysteria/config.json 2>/dev/null | sed -n 12p | grep -w private) ]]; then
+certificatepp='/etc/ssl/private/private.key'
+certificatecc='/etc/ssl/private/cert.crt'
 elif [[ -n $(cat /etc/hysteria/config.json 2>/dev/null | sed -n 12p | grep -w hysteria) ]]; then
 certificatepp='/etc/hysteria/private.key'
 certificatecc='/etc/hysteria/cert.crt'
@@ -657,7 +657,7 @@ fi
 servername=`cat /root/HY/acl/v2rayn.json 2>/dev/null | grep -w server_name | awk '{print $2}' | awk -F '"' '{ print $2}'`
 certificate=`cat /etc/hysteria/config.json 2>/dev/null | grep cert | awk '{print $2}' | awk -F '"' '{ print $2}'`
 green "hysteria协议证书切换:"
-readp "1. www.bing.com自签证书（回车默认）\n2. acme一键申请证书脚本（支持常规80端口模式与dns api模式），已用此脚本申请的证书则自动识别\n3. 自定义证书路径（非/root/ygkkkca路径）\n请选择：" certificate
+readp "1. www.bing.com自签证书（回车默认）\n2. acme一键申请证书脚本（支持常规80端口模式与dns api模式），已用此脚本申请的证书则自动识别\n3. 自定义证书路径（非/etc/ssl/private路径）\n请选择：" certificate
 if [ -z "${certificate}" ] || [ $certificate == "1" ]; then
 whcertificate
 if [[ -f /etc/hysteria/cert.crt && -f /etc/hysteria/private.key ]]; then
@@ -679,7 +679,7 @@ elif [ $certificate == "2" ]; then
 whcertificate
 if [[ -f /etc/ssl/private/cert.crt && -f /etc/ssl/private/private.key ]] && [[ -s /etc/ssl/private/cert.crt && -s /etc/ssl/private/private.key ]]; then
 blue "经检测，之前已使用此acme脚本申请过证书"
-readp "1. 直接使用root/ygkkkca目录下申请过证书（回车默认）\n2. 删除原来的证书，重新申请acme证书\n请选择：" certacme
+readp "1. 直接使用etc/ssl/private目录下申请过证书（回车默认）\n2. 删除原来的证书，重新申请acme证书\n请选择：" certacme
 if [ -z "${certacme}" ] || [ $certacme == "1" ]; then
 ym=$(cat /etc/ssl/private/ca.log)
 blue "检测到的域名：$ym ，已直接引用\n"
@@ -704,8 +704,8 @@ if [[ ! -f /etc/ssl/private/cert.crt && ! -f /etc/ssl/private/private.key ]] && 
 red "证书申请失败，脚本退出" && exit
 fi
 fi
-certificatec='/root/ygkkkca/cert.crt'
-certificatep='/root/ygkkkca/private.key'
+certificatec='/etc/ssl/private/cert.crt'
+certificatep='/etc/ssl/private/private.key'
 certclient
 sed -i '21s/true/false/g' /root/HY/acl/v2rayn.json
 sed -i 's/true/false/g' /root/HY/URL.txt
@@ -733,11 +733,11 @@ if [[ $certificate = '/etc/hysteria/cert.crt' && -n $(curl -s6m6 api64.ipify.org
 sed -i "2s/\[$oldserver\]/${ymip}/g" /root/HY/acl/v2rayn.json
 sed -i "s/\[$oldserver\]/${ymip}/g" /root/HY/URL.txt
 sed -i "23s/$oldserver/${ymip}/g" /root/HY/acl/Cmeta-hy.yaml
-elif [[ $certificate = '/root/ygkkkca/cert.crt' && -n $(curl -s6m6 api64.ipify.org -k) ]]; then
+elif [[ $certificate = '/etc/ssl/private/cert.crt' && -n $(curl -s6m6 api64.ipify.org -k) ]]; then
 sed -i "2s/$oldserver/\[${ymip}\]/g" /root/HY/acl/v2rayn.json
 sed -i "s/$oldserver/\[${ymip}\]/" /root/HY/URL.txt
 sed -i "23s/$oldserver/${ymip}/g" /root/HY/acl/Cmeta-hy.yaml
-elif [[ $certificate = '/root/ygkkkca/cert.crt' && -z $(curl -s6m6 api64.ipify.org -k) ]]; then
+elif [[ $certificate = '/etc/ssl/private/cert.crt' && -z $(curl -s6m6 api64.ipify.org -k) ]]; then
 sed -i "2s/$oldserver/${ymip}/g" /root/HY/acl/v2rayn.json
 sed -i "s/$oldserver/${ymip}/" /root/HY/URL.txt
 sed -i "23s/$oldserver/${ymip}/g" /root/HY/acl/Cmeta-hy.yaml
@@ -874,7 +874,7 @@ ymip=$(cat /etc/ssl/private/ca.log)
 fi
 }
 wgcfgo
-url="hysteria://${ymip}:${port}?protocol=${hysteria_protocol}&auth=${pswd}&peer=${ym}&insecure=${ins}&upmbps=10&downmbps=50&alpn=h3#hysteria-ygkkk"
+url="hysteria://${ymip}:${port}?protocol=${hysteria_protocol}&auth=${pswd}&peer=${ym}&insecure=${ins}&upmbps=10&downmbps=50&alpn=h3#hysteria-1"
 echo ${url} > /root/HY/URL.txt
 red "======================================================================================"
 green "hysteria代理服务安装完成，生成脚本的快捷方式为 hy" && sleep 3
