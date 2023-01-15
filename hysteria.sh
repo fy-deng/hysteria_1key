@@ -1,6 +1,6 @@
 #!/bin/bash
 hyygV="22.12.9 V 5.7"
-remoteV=`wget -qO- https://gitlab.com/rwkgyg/hysteria-yg/raw/main/hysteria.sh | sed  -n 2p | cut -d '"' -f 2`
+remoteV=`wget -qO- https://raw.githubusercontent.com/fy-deng/Hysteria/main/hysteria.sh | sed  -n 2p | cut -d '"' -f 2`
 chmod +x /root/hysteria.sh 
 red='\033[0;31m'
 yellow='\033[0;33m'
@@ -153,7 +153,7 @@ fi
 systemctl stop hysteria-server >/dev/null 2>&1
 systemctl disable hysteria-server >/dev/null 2>&1
 rm -rf /usr/local/bin/hysteria /etc/hysteria /root/HY
-wget -N https://gitlab.com/rwkgyg/hysteria-yg/raw/main/install_server.sh && bash install_server.sh
+wget -N https://raw.githubusercontent.com/fy-deng/Hysteria/main/install_server.sh && bash install_server.sh
 if [[ -f '/usr/local/bin/hysteria' ]]; then
 blue "成功安装hysteria内核版本：$(/usr/local/bin/hysteria -v | awk 'NR==1 {print $3}')\n"
 else
@@ -173,30 +173,30 @@ certificatep='/etc/hysteria/private.key'
 certificatec='/etc/hysteria/cert.crt'
 blue "已确认证书模式: www.bing.com自签证书\n"
 elif [ $certificate == "2" ]; then
-if [[ -f /root/ygkkkca/cert.crt && -f /root/ygkkkca/private.key ]] && [[ -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
+if [[ -f /etc/ssl/private/cert.crt && -f /etc/ssl/private/private.key ]] && [[ -s /etc/ssl/private/cert.crt && -s /etc/ssl/private/private.key ]]; then
 blue "经检测，之前已使用此acme脚本申请过证书"
 readp "1. 直接使用root/ygkkkca目录下申请过证书（回车默认）\n2. 删除原来的证书，重新申请acme证书\n请选择：" certacme
 if [ -z "${certacme}" ] || [ $certacme == "1" ]; then
-ym=$(cat /root/ygkkkca/ca.log)
+ym=$(cat /etc/ssl/private/ca.log)
 blue "检测到的域名：$ym ，已直接引用\n"
 elif [ $certacme == "2" ]; then
 curl https://get.acme.sh | sh
 bash /root/.acme.sh/acme.sh --uninstall
-rm -rf /root/ygkkkca
+rm -rf /etc/ssl/private
 rm -rf ~/.acme.sh acme.sh
 sed -i '/--cron/d' /etc/crontab
 [[ -z $(/root/.acme.sh/acme.sh -v 2>/dev/null) ]] && green "acme.sh卸载完毕" || red "acme.sh卸载失败"
 sleep 2
-wget -N https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh && bash acme.sh
-ym=$(cat /root/ygkkkca/ca.log)
-if [[ ! -f /root/ygkkkca/cert.crt && ! -f /root/ygkkkca/private.key ]] && [[ ! -s /root/ygkkkca/cert.crt && ! -s /root/ygkkkca/private.key ]]; then
+wget -N https://raw.githubusercontent.com/fy-deng/acme-2/main/acme.sh && bash acme.sh
+ym=$(cat /etc/ssl/private/ca.log)
+if [[ ! -f /etc/ssl/private/cert.crt && ! -f /etc/ssl/private/private.key ]] && [[ ! -s /etc/ssl/private/cert.crt && ! -s /etc/ssl/private/private.key ]]; then
 red "证书申请失败，脚本退出" && exit
 fi
 fi
 else
-wget -N https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh && bash acme.sh
-ym=$(cat /root/ygkkkca/ca.log)
-if [[ ! -f /root/ygkkkca/cert.crt && ! -f /root/ygkkkca/private.key ]] && [[ ! -s /root/ygkkkca/cert.crt && ! -s /root/ygkkkca/private.key ]]; then
+wget -N https://raw.githubusercontent.com/fy-deng/acme-2/main/acme.sh && bash acme.sh
+ym=$(cat /etc/ssl/private/ca.log)
+if [[ ! -f /etc/ssl/private/cert.crt && ! -f /etc/ssl/private/private.key ]] && [[ ! -s /etc/ssl/private/cert.crt && ! -s /etc/ssl/private/private.key ]]; then
 red "证书申请失败，脚本退出" && exit
 fi
 fi
@@ -343,8 +343,8 @@ fi
 
 if [[ $ym = www.bing.com ]]; then
 Cymip=$ip;ins=true
-elif [[ -n $(cat /root/ygkkkca/ca.log) ]]; then
-ym=$(cat /root/ygkkkca/ca.log)
+elif [[ -n $(cat /etc/ssl/private/ca.log) ]]; then
+ym=$(cat /etc/ssl/private/ca.log)
 Cymip=$ym;ymip=$ym;ins=false
 else
 Cymip=$ym;ymip=$ym;ins=false
@@ -538,7 +538,7 @@ uphysteriacore(){
 if [[ -z $(systemctl status hysteria-server 2>/dev/null | grep -w active) || ! -f '/etc/hysteria/config.json' ]]; then
 red "未正常安装hysteria!" && exit
 fi
-wget -N https://gitlab.com/rwkgyg/hysteria-yg/raw/main/install_server.sh && bash install_server.sh
+wget -N https://raw.githubusercontent.com/fy-deng/Hysteria/main/install_server.sh && bash install_server.sh
 systemctl restart hysteria-server
 VERSION="$(/usr/local/bin/hysteria -v | awk 'NR==1 {print $3}')"
 blue "当前hysteria内核版本号：$VERSION"
@@ -577,7 +577,7 @@ uphyyg(){
 if [[ -z $(systemctl status hysteria-server 2>/dev/null | grep -w active) || ! -f '/etc/hysteria/config.json' ]]; then
 red "未正常安装hysteria!" && exit
 fi
-wget -N https://gitlab.com/rwkgyg/hysteria-yg/raw/main/hysteria.sh
+wget -N https://raw.githubusercontent.com/fy-deng/Hysteria/main/hysteria.sh
 chmod +x /root/hysteria.sh 
 ln -sf /root/hysteria.sh /usr/bin/hy
 green "安装脚本升级成功" && hy
@@ -588,7 +588,7 @@ wget -N --no-check-certificate https://gitlab.com/rwkgyg/cfwarp/raw/main/CFwarp.
 }
 
 acme(){
-bash <(curl -L -s https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh)
+bash <(curl -L -s https://raw.githubusercontent.com/fy-deng/acme-2/main/acme.sh)
 }
 
 changepr(){
@@ -627,8 +627,8 @@ else
 oldserver=`cat /root/HY/acl/v2rayn.json 2>/dev/null | grep -w server | awk '{print $2}' | awk -F '"' '{ print $2}'| cut -d ':' -f 1`
 fi
 if [[ $certificate = '/etc/hysteria/cert.crt' ]]; then
-ym=$(cat /root/ygkkkca/ca.log)
-ymip=$(cat /root/ygkkkca/ca.log)
+ym=$(cat /etc/ssl/private/ca.log)
+ymip=$(cat /etc/ssl/private/ca.log)
 else
 ym=www.bing.com
 ymip=$ip
@@ -677,30 +677,30 @@ sed -i '32s/false/true/g' /root/HY/acl/Cmeta-hy.yaml
 blue "已确认证书模式: www.bing.com自签证书\n"
 elif [ $certificate == "2" ]; then
 whcertificate
-if [[ -f /root/ygkkkca/cert.crt && -f /root/ygkkkca/private.key ]] && [[ -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
+if [[ -f /etc/ssl/private/cert.crt && -f /etc/ssl/private/private.key ]] && [[ -s /etc/ssl/private/cert.crt && -s /etc/ssl/private/private.key ]]; then
 blue "经检测，之前已使用此acme脚本申请过证书"
 readp "1. 直接使用root/ygkkkca目录下申请过证书（回车默认）\n2. 删除原来的证书，重新申请acme证书\n请选择：" certacme
 if [ -z "${certacme}" ] || [ $certacme == "1" ]; then
-ym=$(cat /root/ygkkkca/ca.log)
+ym=$(cat /etc/ssl/private/ca.log)
 blue "检测到的域名：$ym ，已直接引用\n"
 elif [ $certacme == "2" ]; then
 curl https://get.acme.sh | sh
 bash /root/.acme.sh/acme.sh --uninstall
-rm -rf /root/ygkkkca
+rm -rf /etc/ssl/private
 rm -rf ~/.acme.sh acme.sh
 sed -i '/--cron/d' /etc/crontab
 [[ -z $(/root/.acme.sh/acme.sh -v 2>/dev/null) ]] && green "acme.sh卸载完毕" || red "acme.sh卸载失败"
 sleep 2
-wget -N https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh && bash acme.sh
-ym=$(cat /root/ygkkkca/ca.log)
-if [[ ! -f /root/ygkkkca/cert.crt && ! -f /root/ygkkkca/private.key ]] && [[ ! -s /root/ygkkkca/cert.crt && ! -s /root/ygkkkca/private.key ]]; then
+wget -N https://raw.githubusercontent.com/fy-deng/acme-2/main/acme.sh && bash acme.sh
+ym=$(cat /etc/ssl/private/ca.log)
+if [[ ! -f /etc/ssl/private/cert.crt && ! -f /etc/ssl/private/private.key ]] && [[ ! -s /etc/ssl/private/cert.crt && ! -s /etc/ssl/private/private.key ]]; then
 red "证书申请失败，脚本退出" && exit
 fi
 fi
 else
-wget -N https://gitlab.com/rwkgyg/acme-script/raw/main/acme.sh && bash acme.sh
-ym=$(cat /root/ygkkkca/ca.log)
-if [[ ! -f /root/ygkkkca/cert.crt && ! -f /root/ygkkkca/private.key ]] && [[ ! -s /root/ygkkkca/cert.crt && ! -s /root/ygkkkca/private.key ]]; then
+wget -N https://raw.githubusercontent.com/fy-deng/acme-2/main/acme.sh && bash acme.sh
+ym=$(cat /etc/ssl/private/ca.log)
+if [[ ! -f /etc/ssl/private/cert.crt && ! -f /etc/ssl/private/private.key ]] && [[ ! -s /etc/ssl/private/cert.crt && ! -s /etc/ssl/private/private.key ]]; then
 red "证书申请失败，脚本退出" && exit
 fi
 fi
@@ -859,7 +859,7 @@ sed -i '/systemctl restart hysteria-server/d' /etc/crontab
 echo "0 4 * * * systemctl restart hysteria-server >/dev/null 2>&1" >> /etc/crontab
 chmod +x /root/hysteria.sh 
 ln -sf /root/hysteria.sh /usr/bin/hy
-wget -NP /root/HY https://gitlab.com/rwkgyg/hysteria-yg/raw/main/GetRoutes.py 
+wget -NP /root/HY https://raw.githubusercontent.com/fy-deng/Hysteria/main/GetRoutes.py
 python3 /root/HY/GetRoutes.py
 mv -f Country.mmdb routes.acl /root/HY/acl
 hysteriastatus
@@ -870,7 +870,7 @@ if [[ $certificate = '/etc/hysteria/cert.crt' ]]; then
 ip=$(curl -s4m6 api64.ipify.org -k) || ip=$(curl -s6m6 api64.ipify.org -k)
 [[ -z $(echo $ip | grep ":") ]] && ymip=$ip || ymip="[$ip]"
 else
-ymip=$(cat /root/ygkkkca/ca.log)
+ymip=$(cat /etc/ssl/private/ca.log)
 fi
 }
 wgcfgo
@@ -950,9 +950,9 @@ echo -e "${bblue}     ░██        ░${plain}██    ░██ ██    
 echo -e "${bblue}     ░██ ${plain}        ░██    ░░██        ░██ ░██       ░${red}██ ░██       ░██ ░██ ${plain}  "
 echo -e "${bblue}     ░█${plain}█          ░██ ██ ██         ░██  ░░${red}██     ░██  ░░██     ░██  ░░██ ${plain}  "
 green "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
-white "甬哥Gitlab项目  ：gitlab.com/rwkgyg"
-white "甬哥blogger博客 ：ygkkk.blogspot.com"
-white "甬哥YouTube频道 ：www.youtube.com/c/甬哥侃侃侃kkkyg"
+#white "甬哥Gitlab项目  ：gitlab.com/rwkgyg"
+#white "甬哥blogger博客 ：ygkkk.blogspot.com"
+#white "甬哥YouTube频道 ：www.youtube.com/c/甬哥侃侃侃kkkyg"
 green "hysteria-yg脚本安装成功后，再次进入脚本的快捷方式为 hy"
 red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 green " 1. 安装hysteria（必选）" 
