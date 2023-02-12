@@ -1,5 +1,5 @@
 #!/bin/bash
-hyygV="22.12.9 V 5.7"
+hyygV="23.1.19 V 5.8"
 remoteV=`wget -qO- https://raw.githubusercontent.com/fy-deng/Hysteria/main/hysteria.sh | sed  -n 2p | cut -d '"' -f 2`
 chmod +x /root/hysteria.sh 
 red='\033[0;31m'
@@ -109,7 +109,7 @@ if [[ -z $(systemctl status netfilter-persistent 2>/dev/null | grep -w active) ]
 $yumapt update;$yumapt install netfilter-persistent
 fi 
 if [[ -z $(grep 'DiG 9' /etc/hosts) ]]; then
-v4=$(curl -s4m6 api64.ipify.org -k)
+v4=$(curl -s4m6 ip.sb -k)
 if [ -z $v4 ]; then
 echo -e nameserver 2a01:4f8:c2c:123f::1 > /etc/resolv.conf
 fi
@@ -303,7 +303,7 @@ fi
 
 insconfig(){
 green "设置配置文件中……，稍等5秒"
-v4=$(curl -s4m6 api64.ipify.org -k)
+v4=$(curl -s4m6 ip.sb -k)
 [[ -z $v4 ]] && rpip=64 || rpip=46
 cat <<EOF > /etc/hysteria/config.json
 {
@@ -323,7 +323,7 @@ cat <<EOF > /etc/hysteria/config.json
 EOF
 
 sureipadress(){
-ip=$(curl -s4m6 api64.ipify.org -k) || ip=$(curl -s6m6 api64.ipify.org -k)
+ip=$(curl -s4m6 ip.sb -k) || ip=$(curl -s6m6 ip.sb -k)
 [[ -z $(echo $ip | grep ":") ]] && ymip=$ip || ymip="[$ip]" 
 }
 
@@ -401,7 +401,7 @@ dns:
     - 114.114.114.114
     - 223.5.5.5
 proxies:
-  - name: "hysteria-ygkkk"
+  - name: "hysteria"
     type: hysteria
     server: ${Cymip}
     port: $port
@@ -417,7 +417,7 @@ proxy-groups:
   - name: "PROXY"
     type: select
     proxies:
-     - hysteria-ygkkk
+     - hysteria
 rule-providers:
   reject:
     type: http
@@ -615,10 +615,10 @@ red "未正常安装hysteria!" && exit
 fi
 certclient(){
 sureipadress(){
-ip=$(curl -s4m6 api64.ipify.org -k) || ip=$(curl -s6m6 api64.ipify.org -k)
+ip=$(curl -s4m6 ip.sb -k) || ip=$(curl -s6m6 ip.sb -k)
 certificate=`cat /etc/hysteria/config.json 2>/dev/null | grep cert | awk '{print $2}' | awk -F '"' '{ print $2}'`
 if [[ $certificate = '/etc/hysteria/cert.crt' ]]; then
-if [[ -n $(curl -s6m6 api64.ipify.org -k) ]]; then
+if [[ -n $(curl -s6m6 ip.sb -k) ]]; then
 oldserver=`cat /root/HY/acl/v2rayn.json 2>/dev/null | grep -w server | awk '{print $2}' | awk -F '"' '{ print $2}' | grep -o '\[.*\]' | cut -d '[' -f2|cut -d ']' -f1`
 else
 oldserver=`cat /root/HY/acl/v2rayn.json 2>/dev/null | grep -w server | awk '{print $2}' | awk -F '"' '{ print $2}'| cut -d ':' -f 1`
@@ -729,19 +729,19 @@ red "输入错误，请重新选择" && changecertificate
 fi
 
 sureipadress(){
-if [[ $certificate = '/etc/hysteria/cert.crt' && -n $(curl -s6m6 api64.ipify.org -k) ]]; then
+if [[ $certificate = '/etc/hysteria/cert.crt' && -n $(curl -s6m6 ip.sb -k) ]]; then
 sed -i "2s/\[$oldserver\]/${ymip}/g" /root/HY/acl/v2rayn.json
 sed -i "s/\[$oldserver\]/${ymip}/g" /root/HY/URL.txt
 sed -i "23s/$oldserver/${ymip}/g" /root/HY/acl/Cmeta-hy.yaml
-elif [[ $certificate = '/etc/ssl/private/cert.crt' && -n $(curl -s6m6 api64.ipify.org -k) ]]; then
+elif [[ $certificate = '/etc/ssl/private/cert.crt' && -n $(curl -s6m6 ip.sb -k) ]]; then
 sed -i "2s/$oldserver/\[${ymip}\]/g" /root/HY/acl/v2rayn.json
 sed -i "s/$oldserver/\[${ymip}\]/" /root/HY/URL.txt
 sed -i "23s/$oldserver/${ymip}/g" /root/HY/acl/Cmeta-hy.yaml
-elif [[ $certificate = '/etc/ssl/private/cert.crt' && -z $(curl -s6m6 api64.ipify.org -k) ]]; then
+elif [[ $certificate = '/etc/ssl/private/cert.crt' && -z $(curl -s6m6 ip.sb -k) ]]; then
 sed -i "2s/$oldserver/${ymip}/g" /root/HY/acl/v2rayn.json
 sed -i "s/$oldserver/${ymip}/" /root/HY/URL.txt
 sed -i "23s/$oldserver/${ymip}/g" /root/HY/acl/Cmeta-hy.yaml
-elif [[ $certificate = '/etc/hysteria/cert.crt' && -z $(curl -s6m6 api64.ipify.org -k) ]]; then
+elif [[ $certificate = '/etc/hysteria/cert.crt' && -z $(curl -s6m6 ip.sb -k) ]]; then
 sed -i "2s/$oldserver/${ymip}/g" /root/HY/acl/v2rayn.json
 sed -i "s/$oldserver/${ymip}/g" /root/HY/URL.txt
 sed -i "23s/$oldserver/${ymip}/g" /root/HY/acl/Cmeta-hy.yaml
@@ -761,8 +761,8 @@ changeip(){
 if [[ -z $(systemctl status hysteria-server 2>/dev/null | grep -w active) || ! -f '/etc/hysteria/config.json' ]]; then
 red "未正常安装hysteria!" && exit
 fi
-ipv6=$(curl -s6m6 api64.ipify.org -k) 
-ipv4=$(curl -s4m6 api64.ipify.org -k)
+ipv6=$(curl -s6m6 ip.sb -k)
+ipv4=$(curl -s4m6 ip.sb -k)
 chip(){
 rpip=`cat /etc/hysteria/config.json 2>/dev/null | grep resolve_preference | awk '{print $2}' | awk -F '"' '{ print $2}'`
 sed -i "4s/$rpip/$rrpip/g" /etc/hysteria/config.json
@@ -867,7 +867,7 @@ white "$status\n"
 sureipadress(){
 certificate=`cat /etc/hysteria/config.json 2>/dev/null | grep cert | awk '{print $2}' | awk -F '"' '{ print $2}'`
 if [[ $certificate = '/etc/hysteria/cert.crt' ]]; then
-ip=$(curl -s4m6 api64.ipify.org -k) || ip=$(curl -s6m6 api64.ipify.org -k)
+ip=$(curl -s4m6 ip.sb -k) || ip=$(curl -s6m6 ip.sb -k)
 [[ -z $(echo $ip | grep ":") ]] && ymip=$ip || ymip="[$ip]"
 else
 ymip=$(cat /etc/ssl/private/ca.log)
@@ -899,8 +899,8 @@ wgcfv4=$(curl -s4m5 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cu
 if [[ -n $(systemctl status hysteria-server 2>/dev/null | grep -w active) && -f '/etc/hysteria/config.json' ]]; then
 noprotocol=`cat /etc/hysteria/config.json 2>/dev/null | grep protocol | awk '{print $2}' | awk -F '"' '{ print $2}'`
 rpip=`cat /etc/hysteria/config.json 2>/dev/null | grep resolve_preference | awk '{print $2}' | awk -F '"' '{ print $2}'`
-v6=$(curl -s6m6 api64.ipify.org -k)
-v4=$(curl -s4m6 api64.ipify.org -k)
+v4=$(curl -s4m6 ip.sb -k)
+v6=$(curl -s6m6 ip.sb -k)
 [[ -z $v4 ]] && showv4='IPV4地址丢失，请切换至IPV6或者重装hysteria' || showv4=$v4
 [[ -z $v6 ]] && showv6='IPV6地址丢失，请切换至IPV4或者重装hysteria' || showv6=$v6
 if [[ $rpip = 64 ]]; then
